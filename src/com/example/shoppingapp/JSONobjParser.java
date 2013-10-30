@@ -31,7 +31,7 @@ public class JSONobjParser {
 
 		try{
 			ArrayList<SubCat> response=new ArrayList<SubCat>();
-			JSONArray categories=job.getJSONArray("categories");//needs to be edited
+			JSONArray categories=job.getJSONArray("categories");
 			for (int i=0; i<categories.length(); i++){
 				response.add(new SubCat(categories.getJSONObject(i)));
 			}
@@ -48,9 +48,9 @@ public class JSONobjParser {
 
 		try{
 			ArrayList<Product> response=new ArrayList<Product>();
-			JSONArray categories=job.getJSONArray("categories");
-			for (int i=0; i<categories.length(); i++){
-				response.add(new Product(categories.getJSONObject(i)));
+			JSONArray products=job.getJSONArray("products");
+			for (int i=0; i<products.length(); i++){
+				response.add(new Product(products.getJSONObject(i)));
 			}
 			return response;
 		}catch (Exception e){
