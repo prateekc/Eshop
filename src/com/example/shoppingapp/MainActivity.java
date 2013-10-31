@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -37,7 +38,7 @@ public class MainActivity extends Activity {
 	OnItemClickListener onClk;
 	OnItemClickListener onClkSubC;
 	OnItemClickListener onClkProduct;
-	ArrayList<Product> respProd;
+	ArrayList<Product> respProd; //arraylists of processed json objects to be shown in list
 	ArrayList<Catagory> respCate;
 	ArrayList<SubCat> respSubCat;
 	String level="";
@@ -47,9 +48,14 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		txtv=(TextView) findViewById(R.id.info);
 		listV=(ListView) findViewById(R.id.list);
-		final JsonParser jsop=new JsonParser();
+		
+		//checking connection to Internet
+		if(connectionValidatro()){
 		new ConnectionTask().execute("a");
-
+		}else{
+			Toast.makeText(getApplicationContext(), "please connect to internet", Toast.LENGTH_SHORT).show();
+		}
+		//Listner for catagory list
 		onClk=new OnItemClickListener() {
 
 			@Override
@@ -57,12 +63,12 @@ public class MainActivity extends Activity {
 					long arg3) {
 				level="subCat";
 				String identifier=((TextView) arg1.findViewById(R.id.identifier)).getText().toString();
-				//Toast.makeText(getApplicationContext(), "Clicked item is"+identifier, Toast.LENGTH_LONG).show();
 				new ConnectionTaskSubc().execute(identifier);
 				// TODO Auto-generated method stub
 
 			}
 		};
+		//Listener for subcatagory list
 		onClkSubC=new OnItemClickListener() {
 
 			@Override
@@ -70,23 +76,20 @@ public class MainActivity extends Activity {
 					long arg3) {
 				level="product";
 				String identifier=((TextView) arg1.findViewById(R.id.identifiersubc)).getText().toString();
-				//Toast.makeText(getApplicationContext(), "Clicked item is"+identifier, Toast.LENGTH_LONG).show();
 				new ConnectionTaskProduct().execute(identifier);
 				// TODO Auto-generated method stub
 
 			}
 		};
-
+		//listner for product list
 		onClkProduct=new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				String identifier=((TextView) arg1.findViewById(R.id.identifierprod)).getText().toString();
-				//Toast.makeText(getApplicationContext(), "Clicked item is"+identifier, Toast.LENGTH_LONG).show();
-				//Product productClicked=respProd.get(arg2);
 				Bundle bundle=new Bundle();
-				bundle.putString("prodID", identifier);
+				bundle.putString("prodID", identifier);//sending product identifier to new list
 				Intent newIntent = new Intent(MainActivity.this, ProductDetailActivity.class);
 				newIntent.putExtras(bundle);
 				startActivity(newIntent);
@@ -96,7 +99,7 @@ public class MainActivity extends Activity {
 		};
 
 	}
-
+	//Arrayadapter for SubCatagory List
 	private class AdapterForThisSubC extends ArrayAdapter<SubCat>{
 		private List<SubCat> objects;
 		public AdapterForThisSubC(Context context, int resource, List<SubCat> objects) {
@@ -120,12 +123,11 @@ public class MainActivity extends Activity {
 			ident.setText(data.id);
 			level.setText("subcat");
 			text.setText(data.title);
-
-
 			return v;
 		}
 
 	}
+	//Array Adapter for Catagory List
 	private class AdapterForThis extends ArrayAdapter<Catagory>{
 		private List<Catagory> objects;
 		public AdapterForThis(Context context, int resource, List<Catagory> objects) {
@@ -151,11 +153,11 @@ public class MainActivity extends Activity {
 			level.setText("cate");
 			text.setText(data.title);
 			img.setImageDrawable(data.img);
-
 			return v;
 		}
 
 	}	
+	//ArrayAdapter for Products list
 	private class AdapterForThisProduct extends ArrayAdapter<Product>{
 		private List<Product> objects;
 		public AdapterForThisProduct(Context context, int resource, List<Product> objects) {
@@ -172,7 +174,6 @@ public class MainActivity extends Activity {
 				v = vi.inflate(R.layout.customlistitemproduct, null);
 			}
 			Product data=objects.get(position);
-
 			TextView text=(TextView) v.findViewById(R.id.text1prod);
 			ImageView img=(ImageView) v.findViewById(R.id.image1prod);
 			TextView ident=(TextView) v.findViewById(R.id.identifierprod);
@@ -181,11 +182,13 @@ public class MainActivity extends Activity {
 			level.setText("subcat");
 			text.setText(data.toString());
 			img.setImageDrawable(data.images.thumbSmall);
-
 			return v;
 		}
 
 	}
+	//Async connection tasks for each eccess defined below these send a request to the JsonParser to get json objects and JSONobjParser for
+	//converting JSON objects into processed custom data objects. This helps keep things simple and also if i wanted to use breadcrums to show the user path he 
+	//took to current state
 	private class ConnectionTask extends AsyncTask<String, Void, String> {
 		String stri;
 
@@ -218,11 +221,6 @@ public class MainActivity extends Activity {
 		}
 		@Override
 		protected void onPostExecute(String result) {
-			if(respSubCat==null) { 
-				Toast.makeText(getApplicationContext(), "broke"+result, Toast.LENGTH_LONG).show();
-				return;
-			}
-			Toast.makeText(getApplicationContext(), respSubCat.get(0).toString(), Toast.LENGTH_LONG).show();
 			comboAdapSubC=new AdapterForThisSubC(MainActivity.this, R.layout.customlistitemsubc, respSubCat);
 			listV.setAdapter(comboAdapSubC);
 			listV.setOnItemClickListener(onClkSubC);
@@ -242,11 +240,6 @@ public class MainActivity extends Activity {
 		}
 		@Override
 		protected void onPostExecute(String result) {
-			if(respProd==null) { 
-				Toast.makeText(getApplicationContext(), "broke"+result, Toast.LENGTH_LONG).show();
-				return;
-			}
-			//Toast.makeText(getApplicationContext(), resp.get(0).toString(), Toast.LENGTH_LONG).show();
 			comboAdapProd=new AdapterForThisProduct(MainActivity.this, R.layout.customlistitemproduct, respProd);
 			listV.setAdapter(comboAdapProd);
 			listV.setOnItemClickListener(onClkProduct);
@@ -254,10 +247,10 @@ public class MainActivity extends Activity {
 		}
 
 	}
+	//back button functionality implementation, uses level to know current location
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)  {
 		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-			// do something on back.
 			if (level.equals("")){
 				finish();
 				System.exit(0);
@@ -270,13 +263,19 @@ public class MainActivity extends Activity {
 				listV.setAdapter(comboAdapSubC);
 				listV.setOnItemClickListener(onClkSubC);
 			}
-			
 			return true;
 		}
-
 		return super.onKeyDown(keyCode, event);
 	}
-
+	/**
+	 * 
+	 * @return true if network access exists
+	 */
+	public boolean connectionValidatro(){
+		return	((ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
+		
+		
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

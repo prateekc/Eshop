@@ -11,7 +11,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
 public class JsonParser {
-	
+	/**
+	 * 
+	 * @param url: url to get JSON from. elements such as ID that define the parameters components of url are already added whrn this is called
+	 * @return returns a JSON object that contains information retrieved from the API
+	 */
 	public JSONObject JsonParse(String url){
 		try{
 			JSONObject job;
@@ -33,7 +37,6 @@ public class JsonParser {
 	        inps.close();
 	        
 	        String jsonO=sb.toString();
-	   //     System.out.println(jsonO);
 	        job=new JSONObject(jsonO);
 	        return job;
 	        }

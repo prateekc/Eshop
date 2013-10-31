@@ -53,8 +53,11 @@ public class ProductDetailActivity extends Activity {
 		}
 		@Override
 		protected void onPostExecute(String result) {
-		title.setText(displayabelProd.title);
+		title.setText(displayabelProd.title+"\nBrand:"+displayabelProd.Brand);
 		prodImg.setImageDrawable(displayabelProd.images.thumb);
+		otherDetails.setText("SKU:"+displayabelProd.id.sku+"\nUPC"+displayabelProd.id.upc);
+		description.setText(displayabelProd.description.desc+"\n"+displayabelProd.description.bullets);
+		
 		}
 
 	}

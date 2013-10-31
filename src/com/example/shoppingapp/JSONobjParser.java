@@ -11,12 +11,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.graphics.drawable.Drawable;
-import android.provider.MediaStore.Images;
-import android.widget.Toast;
-
-import com.example.shoppingapp.JSONobjParser.Catagory;
 
 public class JSONobjParser {
+	/**
+	 * 
+	 * @param job: accepts a JSONObject that is created by JsonParser. converts the object into a custom datatype specific to show category information
+	 * @return an arraylist of custom class that contains information to show in the catagories list
+	 */
 
 	public ArrayList<Catagory> JSONobjParseCat(JSONObject job){
 
@@ -29,15 +30,15 @@ public class JSONobjParser {
 			}
 			return response;
 		}catch (Exception e){
-
+			e.printStackTrace();
 		}
 		return null;
 
 	}
 	/**
 	 * 
-	 * @param 
-	 * @return
+	 * @param job: accepts a JSONObject that is created by JsonParser. converts the object into a custom datatype specific to show subcatagory information
+	 * @return  an arraylist of custom class that contains information to show in the subcatagory list
 	 */
 	public ArrayList<SubCat> JSONobjParseSubCat(JSONObject job){
 
@@ -55,7 +56,11 @@ public class JSONobjParser {
 		return null;
 
 	}
-
+	/**
+	 * 
+	 * @param job: accepts a JSONObject that is created by JsonParser. converts the object into a custom datatype specific to show product information in the list
+	 * @return  an arraylist of custom class that contains information to show in the product list
+	 */
 	public ArrayList<Product> JSONobjParseProduct(JSONObject job){
 
 
@@ -73,11 +78,20 @@ public class JSONobjParser {
 		return null;
 
 	}
+	
+	/**
+	 * 
+	 * @param job: accepts a JSONObject that is created by JsonParser. converts the object into a custom datatype specific to show product information of proj-
+	 * ect page
+	 * @return  a custom class that contains information to show in the product informaion on the project page
+	 */
+	
 	public ProductForDisp JSONobjParserSingProduct(JSONObject job){
 		ProductForDisp response=new ProductForDisp(job);
 		return response;
-		
+
 	}
+	//custom objects for different uses
 	public class Catagory{
 		String title;
 		String id;
@@ -256,7 +270,7 @@ public class JSONobjParser {
 				this.desc=input.getString("leadingEquity");
 				JSONArray tempUse=input.getJSONArray("bullets");
 				for(int i=0; i<tempUse.length();i++){
-					bullets=bullets+tempUse.getJSONObject(i)+"\n";
+					bullets=bullets+"- "+tempUse.getJSONObject(i)+"\n";
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -264,5 +278,5 @@ public class JSONobjParser {
 			}
 		}
 	}
-	
+
 }
