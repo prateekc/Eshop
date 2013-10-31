@@ -12,12 +12,12 @@ import org.json.JSONObject;
 
 public class JsonParser {
 	
-	public JSONObject JsonParse(){
+	public JSONObject JsonParse(String url){
 		try{
 			JSONObject job;
 	        DefaultHttpClient client=new DefaultHttpClient();
 	        HttpGet getReq=new HttpGet();
-	        URI web=new URI("http://bb.apiary.io/");
+	        URI web=new URI(url);
 	        getReq.setURI(web);
 	        getReq.setHeader("accept", "application/json");
 	        HttpResponse resp=client.execute(getReq);

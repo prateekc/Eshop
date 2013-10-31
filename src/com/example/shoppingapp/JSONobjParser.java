@@ -1,10 +1,17 @@
 package com.example.shoppingapp;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import android.graphics.drawable.Drawable;
+import android.provider.MediaStore.Images;
 
 import com.example.shoppingapp.JSONobjParser.Catagory;
 
@@ -65,13 +72,22 @@ public class JSONobjParser {
 		String id;
 		String href;
 		String image;
+		Drawable img;
 		public Catagory(JSONObject inputObj){
 			try {
 				this.title=inputObj.getString("title");
 				this.id=inputObj.getString("id");
 				this.href=inputObj.getString("href");
 				this.image=inputObj.getString("image");
+				img=Drawable.createFromStream((InputStream) new URL(image).getContent(), "src");
+				
 			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -96,6 +112,12 @@ public class JSONobjParser {
 				e.printStackTrace();
 			}
 		}
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return title+"   "+id+"  "+href;
+		}
+
 	}
 	public class Product{
 		String id;
@@ -142,21 +164,32 @@ public class JSONobjParser {
 	}
 	public class imageUrl{
 		String alterText;
-		String full;
-		String thumb;
-		String thumbSmall;
-		String thumbLarge;
+		//String full;
+		Drawable full;
+		Drawable thumb;
+		Drawable thumbSmall;
+		Drawable thumbLarge;
 		public imageUrl(JSONObject inputObj, JSONObject inputObj1){
 			try {
-				this.full=inputObj.getString("full");
+				this.full=getDrawable(inputObj.getString("full"));
 				this.alterText=inputObj1.getString("alt");
-				this.thumb=inputObj1.getString("thumb");
-				this.thumbSmall=inputObj1.getString("1x");
-				this.thumbLarge=inputObj1.getString("2x");
+				this.thumb=getDrawable(inputObj1.getString("thumb"));
+				this.thumbSmall=getDrawable(inputObj1.getString("1x"));
+				this.thumbLarge=getDrawable(inputObj1.getString("2x"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+		}
+		public Drawable getDrawable(String url) throws MalformedURLException, IOException{
+			return Drawable.createFromStream((InputStream) new URL(url).getContent(), "src");
+			
 		}
 	}
 
