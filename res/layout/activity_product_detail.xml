@@ -16,7 +16,7 @@
         android:layout_below="@+id/productimage"
         android:layout_marginLeft="18dp"
         android:layout_marginTop="69dp"
-        android:text="@string/hello_world" />
+        />
 
     <ImageView
         android:id="@+id/productimage"
@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/productimage" />
+         />
 
     <TextView
         android:id="@+id/productotherdetails"
@@ -41,27 +41,30 @@
         android:layout_below="@+id/producttitle"
         android:layout_marginLeft="18dp"
         android:layout_marginTop="20dp"
-        android:text="@string/hello_world" />
+        />
+
     <TextView
         android:id="@+id/productdescription"
         android:layout_width="fill_parent"
-        android:layout_height="150dp"
+        android:layout_height="50dp"
         android:layout_alignParentLeft="true"
-        android:scrollHorizontally="true"
         android:layout_below="@+id/productotherdetails"
-        android:text="@string/hello_world" />
-    
-    
-</RelativeLayout> <!-- android:src="@android:drawable/ic_dialog_alert" -->
-<!-- 
-<TextView
+        android:layout_marginLeft="18dp"
+        android:scrollHorizontally="true"
+        />
+
+    <TextView
         android:id="@+id/productpromos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="18dp"
         android:layout_below="@+id/productdescription"
-        android:text="@string/hello_world" />
+        />
+
+</RelativeLayout> <!-- android:src="@android:drawable/ic_dialog_alert" -->
+<!--
      <ImageView
         android:id="@+id/productother"
         android:layout_width="wrap_content"
@@ -70,4 +73,5 @@
         android:layout_toRightOf="@+id/productpromos"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:background="#00ff00" /> -->
+        android:background="#00ff00" />
+-->

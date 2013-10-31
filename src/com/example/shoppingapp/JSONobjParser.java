@@ -78,14 +78,14 @@ public class JSONobjParser {
 		return null;
 
 	}
-	
+
 	/**
 	 * 
 	 * @param job: accepts a JSONObject that is created by JsonParser. converts the object into a custom datatype specific to show product information of proj-
 	 * ect page
 	 * @return  a custom class that contains information to show in the product informaion on the project page
 	 */
-	
+
 	public ProductForDisp JSONobjParserSingProduct(JSONObject job){
 		ProductForDisp response=new ProductForDisp(job);
 		return response;
@@ -188,6 +188,18 @@ public class JSONobjParser {
 				e.printStackTrace();
 			}
 		}
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			String price="Retail price"+this.retail+"\n";
+
+			if(!sale.equals(null)){
+				price=price+"Sale:"+this.sale+"\n";
+			}
+			price=price+"Value: "+this.currency+": "+this.value;
+
+			return price;
+		}
 	}
 	public class imageUrl{
 		String alterText;
@@ -225,8 +237,7 @@ public class JSONobjParser {
 		Price price;
 		Description description;
 		String Brand;
-		String promoDesc;
-		String promoHref;
+		Promo promotions;
 		imageUrl images;
 		public ProductForDisp(JSONObject inputObj){
 			try {
@@ -236,6 +247,8 @@ public class JSONobjParser {
 				this.description=new Description(inputObj.getJSONObject("description"));
 				//this.price=new Price(inputObj.getJSONObject("price"));
 				this.images=new imageUrl(inputObj.getJSONObject("image"),inputObj.getJSONArray("images").getJSONObject(0));
+				price=new Price(inputObj.getJSONArray("variations").getJSONObject(0).getJSONObject("price"));
+				promotions=new Promo(inputObj.getJSONArray("promos"));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -255,7 +268,7 @@ public class JSONobjParser {
 			try {
 				this.id=input.getString("id");
 				this.sku=input.getString("sku");
-				this.upc=input.getString(upc);
+				this.upc=input.getString("upc");
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -278,5 +291,19 @@ public class JSONobjParser {
 			}
 		}
 	}
+	public class Promo{
+		String promo="";
+		public Promo(JSONArray input){
+			try{
+				for(int i=0; i<input.length();i++){
+					promo=promo+input.getJSONObject(i).getString("description");
+				}
+
+			}catch(JSONException e){
+				e.printStackTrace();
+			}
+		}
+	}
+
 
 }
