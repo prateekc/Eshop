@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import android.graphics.drawable.Drawable;
 import android.provider.MediaStore.Images;
+import android.widget.Toast;
 
 import com.example.shoppingapp.JSONobjParser.Catagory;
 
@@ -61,6 +62,7 @@ public class JSONobjParser {
 			}
 			return response;
 		}catch (Exception e){
+			e.printStackTrace();
 			
 		}
 		return null;
@@ -134,15 +136,17 @@ public class JSONobjParser {
 				this.id=inputObj.getString("id");
 				this.href=inputObj.getString("href");
 				this.condition=inputObj.getString("condition");
-				JSONObject promo=inputObj.getJSONObject("promos");
-				this.promoDesc=promo.getString("description");
-				this.promoHref=promo.getString("href");
 				this.price=new Price(inputObj.getJSONObject("price"));
-				this.images=new imageUrl(inputObj.getJSONObject("image"),inputObj.getJSONObject("images"));
+				this.images=new imageUrl(inputObj.getJSONObject("image"),inputObj.getJSONArray("images").getJSONObject(0));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return title+"\n"+price.currency+":"+price.value;
 		}
 	}
 	public class Price{

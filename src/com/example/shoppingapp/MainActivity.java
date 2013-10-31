@@ -1,31 +1,17 @@
 package com.example.shoppingapp;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.example.shoppingapp.JSONobjParser.Catagory;
-import com.example.shoppingapp.JSONobjParser.SubCat;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.Activity;
-import android.app.ListActivity;
-import android.content.Context;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -38,13 +24,23 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.shoppingapp.JSONobjParser.Catagory;
+import com.example.shoppingapp.JSONobjParser.Product;
+import com.example.shoppingapp.JSONobjParser.SubCat;
+
 public class MainActivity extends Activity {
 	TextView txtv;
 	ListView listV;
 	AdapterForThis comboAdap;
 	AdapterForThisSubC comboAdapSubC;
+	AdapterForThisProduct comboAdapProd;
 	OnItemClickListener onClk;
-	
+	OnItemClickListener onClkSubC;
+	OnItemClickListener onClkProduct;
+	ArrayList<Product> respProd;
+	ArrayList<Catagory> respCate;
+	ArrayList<SubCat> respSubCat;
+	String level="";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,21 +49,54 @@ public class MainActivity extends Activity {
 		listV=(ListView) findViewById(R.id.list);
 		final JsonParser jsop=new JsonParser();
 		new ConnectionTask().execute("a");
-		
+
 		onClk=new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
+				level="subCat";
 				String identifier=((TextView) arg1.findViewById(R.id.identifier)).getText().toString();
 				//Toast.makeText(getApplicationContext(), "Clicked item is"+identifier, Toast.LENGTH_LONG).show();
 				new ConnectionTaskSubc().execute(identifier);
 				// TODO Auto-generated method stub
-				
+
 			}
 		};
-		
+		onClkSubC=new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				level="product";
+				String identifier=((TextView) arg1.findViewById(R.id.identifiersubc)).getText().toString();
+				//Toast.makeText(getApplicationContext(), "Clicked item is"+identifier, Toast.LENGTH_LONG).show();
+				new ConnectionTaskProduct().execute(identifier);
+				// TODO Auto-generated method stub
+
+			}
+		};
+
+		onClkProduct=new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				String identifier=((TextView) arg1.findViewById(R.id.identifierprod)).getText().toString();
+				//Toast.makeText(getApplicationContext(), "Clicked item is"+identifier, Toast.LENGTH_LONG).show();
+				//Product productClicked=respProd.get(arg2);
+				Bundle bundle=new Bundle();
+				bundle.putString("prodID", identifier);
+				Intent newIntent = new Intent(MainActivity.this, ProductDetailActivity.class);
+				newIntent.putExtras(bundle);
+				startActivity(newIntent);
+				// TODO Auto-generated method stub
+
+			}
+		};
+
 	}
+
 	private class AdapterForThisSubC extends ArrayAdapter<SubCat>{
 		private List<SubCat> objects;
 		public AdapterForThisSubC(Context context, int resource, List<SubCat> objects) {
@@ -75,7 +104,7 @@ public class MainActivity extends Activity {
 			this.objects=objects;
 			// TODO Auto-generated constructor stub
 		}
-		
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent){
 			View v = convertView;
@@ -91,8 +120,8 @@ public class MainActivity extends Activity {
 			ident.setText(data.id);
 			level.setText("subcat");
 			text.setText(data.title);
-			
-			
+
+
 			return v;
 		}
 
@@ -104,7 +133,7 @@ public class MainActivity extends Activity {
 			this.objects=objects;
 			// TODO Auto-generated constructor stub
 		}
-		
+
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent){
 			View v = convertView;
@@ -122,57 +151,131 @@ public class MainActivity extends Activity {
 			level.setText("cate");
 			text.setText(data.title);
 			img.setImageDrawable(data.img);
-			
+
 			return v;
 		}
 
 	}	
-	
+	private class AdapterForThisProduct extends ArrayAdapter<Product>{
+		private List<Product> objects;
+		public AdapterForThisProduct(Context context, int resource, List<Product> objects) {
+			super(context, resource, objects);
+			this.objects=objects;
+			// TODO Auto-generated constructor stub
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent){
+			View v = convertView;
+			if (v == null) {
+				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				v = vi.inflate(R.layout.customlistitemproduct, null);
+			}
+			Product data=objects.get(position);
+
+			TextView text=(TextView) v.findViewById(R.id.text1prod);
+			ImageView img=(ImageView) v.findViewById(R.id.image1prod);
+			TextView ident=(TextView) v.findViewById(R.id.identifierprod);
+			TextView level=(TextView) v.findViewById(R.id.levelprod);
+			ident.setText(data.id);
+			level.setText("subcat");
+			text.setText(data.toString());
+			img.setImageDrawable(data.images.thumbSmall);
+
+			return v;
+		}
+
+	}
 	private class ConnectionTask extends AsyncTask<String, Void, String> {
 		String stri;
-		ArrayList<Catagory> re;
+
 		final JsonParser jsop=new JsonParser();
 		@Override
 		protected String doInBackground(String... arg0) {
 			JSONObject job=jsop.JsonParse("http://bb.apiary.io/");
-			re=new JSONobjParser().JSONobjParseCat(job);
+			respCate=new JSONobjParser().JSONobjParseCat(job);
 			return stri;
 		}
 		@Override
 		protected void onPostExecute(String result) {
-			comboAdap=new AdapterForThis(MainActivity.this, R.layout.customlistitem, re);
+			comboAdap=new AdapterForThis(MainActivity.this, R.layout.customlistitem, respCate);
 			listV.setAdapter(comboAdap);
 			listV.setOnItemClickListener(onClk);
 			txtv.setText(stri);
 		}
 
 	}
-	
+
 	private class ConnectionTaskSubc extends AsyncTask<String, Void, String> {
 		String stri;
-		ArrayList<SubCat> resp;
+
 		final JsonParser jsop=new JsonParser();
 		@Override
 		protected String doInBackground(String... arg0) {
 			JSONObject job=jsop.JsonParse("http://bb.apiary.io/categories/"+arg0[0]);
-			resp=new JSONobjParser().JSONobjParseSubCat(job);
+			respSubCat=new JSONobjParser().JSONobjParseSubCat(job);
 			return arg0[0];
 		}
 		@Override
 		protected void onPostExecute(String result) {
-			if(resp==null) { 
+			if(respSubCat==null) { 
 				Toast.makeText(getApplicationContext(), "broke"+result, Toast.LENGTH_LONG).show();
 				return;
 			}
-			Toast.makeText(getApplicationContext(), resp.get(0).toString(), Toast.LENGTH_LONG).show();
-			comboAdapSubC=new AdapterForThisSubC(MainActivity.this, R.layout.customlistitemsubc, resp);
+			Toast.makeText(getApplicationContext(), respSubCat.get(0).toString(), Toast.LENGTH_LONG).show();
+			comboAdapSubC=new AdapterForThisSubC(MainActivity.this, R.layout.customlistitemsubc, respSubCat);
 			listV.setAdapter(comboAdapSubC);
-		//	listV.setOnItemClickListener(onClk);
+			listV.setOnItemClickListener(onClkSubC);
 			txtv.setText(stri);
 		}
 
 	}
+	private class ConnectionTaskProduct extends AsyncTask<String, Void, String> {
+		String stri;
 
+		final JsonParser jsop=new JsonParser();
+		@Override
+		protected String doInBackground(String... arg0) {
+			JSONObject job=jsop.JsonParse("http://bb.apiary.io/categories/"+arg0[0]+"/products");
+			respProd=new JSONobjParser().JSONobjParseProduct(job);
+			return arg0[0];
+		}
+		@Override
+		protected void onPostExecute(String result) {
+			if(respProd==null) { 
+				Toast.makeText(getApplicationContext(), "broke"+result, Toast.LENGTH_LONG).show();
+				return;
+			}
+			//Toast.makeText(getApplicationContext(), resp.get(0).toString(), Toast.LENGTH_LONG).show();
+			comboAdapProd=new AdapterForThisProduct(MainActivity.this, R.layout.customlistitemproduct, respProd);
+			listV.setAdapter(comboAdapProd);
+			listV.setOnItemClickListener(onClkProduct);
+			txtv.setText(stri);
+		}
+
+	}
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			// do something on back.
+			if (level.equals("")){
+				finish();
+				System.exit(0);
+			} else if(level.equals("subCat")){
+				level="";
+				listV.setAdapter(comboAdap);
+				listV.setOnItemClickListener(onClk);
+			} else if(level.equals("product")){
+				level="subCat";
+				listV.setAdapter(comboAdapSubC);
+				listV.setOnItemClickListener(onClkSubC);
+			}
+			
+			return true;
+		}
+
+		return super.onKeyDown(keyCode, event);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
