@@ -6,7 +6,7 @@ Readable messages in case the JSON parsing fails.
 If there are any changes in the schema, the app will just crash, without a readable message.
 
 As for the cart implementation, in a full implementation first I will need to log in the user, create a connection to the server
-and use the connection to 
+and use the connection to access the instance on the server.
 The mock API does not seem to support complete user identification it is a matter of simply adding 
 elements using the api and parsing the response to get the current state of the UI.
 
