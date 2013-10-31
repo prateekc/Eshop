@@ -34,6 +34,11 @@ public class JSONobjParser {
 		return null;
 
 	}
+	/**
+	 * 
+	 * @param 
+	 * @return
+	 */
 	public ArrayList<SubCat> JSONobjParseSubCat(JSONObject job){
 
 
@@ -45,12 +50,12 @@ public class JSONobjParser {
 			}
 			return response;
 		}catch (Exception e){
-			
+
 		}
 		return null;
 
 	}
-	
+
 	public ArrayList<Product> JSONobjParseProduct(JSONObject job){
 
 
@@ -63,12 +68,16 @@ public class JSONobjParser {
 			return response;
 		}catch (Exception e){
 			e.printStackTrace();
-			
+
 		}
 		return null;
 
 	}
-	
+	public ProductForDisp JSONobjParserSingProduct(JSONObject job){
+		ProductForDisp response=new ProductForDisp(job);
+		return response;
+		
+	}
 	public class Catagory{
 		String title;
 		String id;
@@ -82,7 +91,7 @@ public class JSONobjParser {
 				this.href=inputObj.getString("href");
 				this.image=inputObj.getString("image");
 				img=Drawable.createFromStream((InputStream) new URL(image).getContent(), "src");
-				
+
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -193,8 +202,67 @@ public class JSONobjParser {
 		}
 		public Drawable getDrawable(String url) throws MalformedURLException, IOException{
 			return Drawable.createFromStream((InputStream) new URL(url).getContent(), "src");
-			
+
 		}
 	}
-
+	public class ProductForDisp{
+		Id id;
+		String title;
+		Price price;
+		Description description;
+		String Brand;
+		String promoDesc;
+		String promoHref;
+		imageUrl images;
+		public ProductForDisp(JSONObject inputObj){
+			try {
+				this.title=inputObj.getString("title");
+				this.id=new Id(inputObj.getJSONObject("identifiers"));
+				this.Brand=inputObj.getString("brand");
+				this.description=new Description(inputObj.getJSONObject("description"));
+				//this.price=new Price(inputObj.getJSONObject("price"));
+				this.images=new imageUrl(inputObj.getJSONObject("image"),inputObj.getJSONArray("images").getJSONObject(0));
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		@Override
+		public String toString() {
+			// TODO Auto-generated method stub
+			return title+"\n"+price.currency+":"+price.value;
+		}
+	}
+	public class Id{
+		String id;
+		String sku;
+		String upc;
+		public Id(JSONObject input){
+			try {
+				this.id=input.getString("id");
+				this.sku=input.getString("sku");
+				this.upc=input.getString(upc);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	public class Description{
+		String desc;
+		String bullets="";
+		public Description(JSONObject input){
+			try {
+				this.desc=input.getString("leadingEquity");
+				JSONArray tempUse=input.getJSONArray("bullets");
+				for(int i=0; i<tempUse.length();i++){
+					bullets=bullets+tempUse.getJSONObject(i)+"\n";
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 }
